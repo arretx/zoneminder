@@ -1,0 +1,2 @@
+zm_event_path="/Volumes/Media/ZoneMinder/events" # Path to YOUR ZM Events folder
+copy_to_path="/Volumes/SpeedyG/Movies" # Path to YOUR copy destination

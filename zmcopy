@@ -1,5 +1,7 @@
 #!/bin/bash
 clear 
+. config
+
 # Select the date for which we'll be copying video files.
 
 PS3='For which day?'
@@ -20,7 +22,7 @@ select option1 in "${day[@]}"; do
 done
 
 # Define target folder for copying files
-destination="/Volumes/SpeedyG/Movies/$date" # Target folder
+destination="$copy_to_path/$date" # Target folder
 
 # Check to see if target folder already exists so we don't attempt to create it again
 if [ -d "$destination" ]
@@ -29,8 +31,27 @@ then
 else
     echo "Folder does not exist"
     echo "Creating Folder"
-    mkdir /Volumes/SpeedyG/Movies/$date
+    mkdir $copy_to_path/$date
 fi
+
+copy_files () {
+    
+    echo "You chose $option2."
+    if [ -d "$destination/$option2" ] # Check to see if camera subdirectory already exists on target.
+    then
+    echo "Camera folder already exists"
+    exit
+    else
+    mkdir "$destination/$option2" # Create camera folder if it doesn't exist.
+    
+    # Use find to generate a list of all mp4 files under the ZM folder structure.
+    find $zm_event_path/$1/$date -name \*.mp4 > "$destination/$option2/list.txt"
+    
+    # Use rsync to copy those files from the source to the target.
+    rsync -azvp --no-relative --progress --files-from="$destination/$option2/list.txt" / "/Volumes/SpeedyG/Movies/$date/$option2/"
+    fi 
+
+}
 
 # Select which files we'll be copying by camera name
 PS3='Which ZoneMinder camera?'
@@ -38,47 +59,13 @@ cameras=("Amcrest Patio" "BabyCam1" "Amcrest PTZ" "Quit") # Options
 select option2 in "${cameras[@]}"; do
     case $option2 in
         "Amcrest Patio")
-            echo "You chose $option2."
-            zmcam=1 # ZoneMinder numbers each camera, so we need a number instead of a name.
-            if [ -d "$destination/$option2" ] # Check to see if camera subdirectory already exists on target.
-            then
-            echo "Camera folder already exists"
-            exit
-            else
-            mkdir "$destination/$option2" # Create camera folder if it doesn't exist.
-            
-            # Use find to generate a list of all mp4 files under the ZM folder structure.
-            find /Volumes/Media/ZoneMinder/events/$zmcam/$date -name \*.mp4 > "$destination/$option2/list.txt"
-            
-            # Use rsync to copy those files from the source to the target.
-            rsync -azvp --no-relative --progress --files-from="$destination/$option2/list.txt" / "/Volumes/SpeedyG/Movies/$date/$option2/"
-            fi 
+            copy_files "1"
             ;;
         "Amcrest PTZ")
-            echo "You chose $option2."
-            zmcam=3
-            if [ -d "$destination/$option2" ]
-            then
-            echo "Folder already exists"
-            exit
-            else
-            mkdir "$destination/$option2"
-            find /Volumes/Media/ZoneMinder/events/$zmcam/$date -name \*.mp4 > "$destination/$option2/list.txt"
-            rsync -azvp --no-relative --progress --files-from="$destination/$option2/list.txt" / "/Volumes/SpeedyG/Movies/$date/$option2/"
-            fi 
+            copy_files "3"
             ;;
         "BabyCam1")
-            echo "You chose $option2."
-            zmcam=2
-            if [ -d "$destination/$option2" ]
-            then
-            echo "Folder already exists"
-            exit
-            else
-            mkdir "$destination/$option2"
-            find /Volumes/Media/ZoneMinder/events/$zmcam/$date -name \*.mp4 > "$destination/$option2/list.txt"
-            rsync -azvp --no-relative --progress --files-from="$destination/$option2/list.txt" / "/Volumes/SpeedyG/Movies/$date/$option2/" 
-            fi
+            copy_files "2"
             ;;
         "Quit")
             echo "User requested exit"
