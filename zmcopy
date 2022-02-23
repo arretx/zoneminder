@@ -5,7 +5,7 @@ clear
 # Select the date for which we'll be copying video files.
 
 PS3='For which day?'
-day=("Today" "Yesterday") # Options
+day=("Today" "Yesterday" "2 Days Ago" "3 Days Ago" "4 Days Ago") # Options
 select option1 in "${day[@]}"; do
     case $option1 in
         "Today")
@@ -15,6 +15,21 @@ select option1 in "${day[@]}"; do
         ;;
         "Yesterday")
             date=$(date -v -1d +"%Y-%m-%d")
+            echo $date
+            break
+        ;;
+        "2 Days Ago")
+            date=$(date -v -2d +"%Y-%m-%d")
+            echo $date
+            break
+        ;;
+        "3 Days Ago")
+            date=$(date -v -3d +"%Y-%m-%d")
+            echo $date
+            break
+        ;;
+        "4 Days Ago")
+            date=$(date -v -4d +"%Y-%m-%d")
             echo $date
             break
         ;;
@@ -55,16 +70,16 @@ copy_files () {
 
 # Select which files we'll be copying by camera name
 PS3='Which ZoneMinder camera?'
-cameras=("Amcrest Patio" "BabyCam1" "Amcrest PTZ" "Quit") # Options
+cameras=("$cam1" "$cam3" "$cam2" "Quit") # Options
 select option2 in "${cameras[@]}"; do
     case $option2 in
-        "Amcrest Patio")
+        "$cam1")
             copy_files "1"
             ;;
-        "Amcrest PTZ")
+        "$cam3")
             copy_files "3"
             ;;
-        "BabyCam1")
+        "$cam2")
             copy_files "2"
             ;;
         "Quit")

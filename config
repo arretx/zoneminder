@@ -1,2 +1,8 @@
 zm_event_path="/Volumes/Media/ZoneMinder/events" # Path to YOUR ZM Events folder
 copy_to_path="/Volumes/SpeedyG/Movies" # Path to YOUR copy destination
+
+# Cameras
+
+cam1="Amcrest Patio"
+cam2="Amcrest PTZ"
+cam3="BabyCam1"
